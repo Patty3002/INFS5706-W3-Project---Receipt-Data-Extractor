@@ -11,7 +11,6 @@ from typing import Any
 
 import pandas as pd
 import streamlit as st
-from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
