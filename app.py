@@ -15,11 +15,8 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
-load_dotenv()
-
-gemini_key = os.getenv("GEMINI_API_KEY")
-
-
+# Load Gemini API Key
+gemini_key = st.secrets["GEMINI_API_KEY"]
 # Prompt for Gemini
 EXTRACTION_PROMPT = """
 You are a careful receipt and invoice data extraction system.
@@ -63,10 +60,13 @@ Rules:
   or "image is partially cropped". Use null if there is no useful note.
 """.strip()
 
-# Parses the JSON into a readable object for dictionary conversion
+# Parses the JSON into a Python Dictionary
 def parse_json(res):
     response = res.strip()
 
+    # This code tries to decode the JSON directly, however if it cannot
+    # then it tries to manually decode the JSON, otherwise it
+    # returns an error
     try:
         result = json.loads(res)
         if isinstance(result, dict):
@@ -91,7 +91,7 @@ def parse_json(res):
 
     raise ValueError("No valid JSON object was found in Gemini's response.")
 
-# Extracts the data out of the image
+# Extracts the data out of the image by prompting the Gemini API
 def analyse_image(img):
     img_bytes = uploaded_file.getvalue()
     mime_type = uploaded_file.type
@@ -107,7 +107,7 @@ def analyse_image(img):
         mime_type=mime_type
     )
 
-    client = genai.Client(api_key=gemini_key)
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
     model = "gemini-3.5-flash-lite"
 
